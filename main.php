@@ -1,13 +1,36 @@
 <?php
 session_start();
+$servername = "localhost";
+$username = "admin";
+$password = "admin";
+$dbname = "MineTransfer";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
 $pass = $_SESSION['password'];
 $user = $_SESSION['username'];
 $salt = $_SESSION['salt'];
 if($pass != null && $user != null && $salt != null){
-    
+    $sql = "SELECT * FROM Login WHERE username = '$user';";
+                $result = $conn->query($sql);
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        $salt = $row["salt"];
+                        if (hash('sha256', $salt . $pass, false) === $row["password"]) {
+
+                        } else {
+                            header("Location: transfer");
+                        }
+                    }
+                }
 }else{
     header("Location: transfer");
 }
+?>
+<?php
+$file = $_POST['file'];
+$message = $_POST['message'];
+$expire = $_POST['expire'];
+echo $expire;
 ?>
 <html>
 <link rel="stylesheet" href="mainstyle.css">
@@ -20,19 +43,27 @@ if($pass != null && $user != null && $salt != null){
 
     <div id="mySidenav" class="sidenav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <a href="signup">Register</a>
-        <a href="log_in">Login</a>
+        <a href="transfer">Logout</a>
+        <a href="welcome/files">Files</a>
         <a href="https://github.com/NickNterm">GitHub</a>
     </div>
 
     <div id="main">
         <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
         <div class="uploadform">
-            <img style="width: 200px;" src="upload.png" />
+            <img style="width: 250px;" src="upload.png" />
             <form action="" method="post">
                 <input type="file" name="file" id="file" class="inputfile" />
                 <label for="file">Upload a file</label>
                 <textarea rows='1' name="message" placeholder="Message"></textarea>
+                <select name="expire">
+                    <option value="1">Expire in 1 hour</option>
+                    <option value="2">Expire in 12 hours</option>
+                    <option value="3">Expire in 1 day</option>
+                    <option value="4">Expire in 2 days</option>
+                    <option value="5">Expire in 3 days</option>
+                    <option value="6">Expire in 1 week</option>
+                </select>
                 <button type="submit">Transfer</button>
             </form>
         </div>

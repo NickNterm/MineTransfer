@@ -1,15 +1,16 @@
 <html>
 <link rel="stylesheet" href="mainstyle.css">
+
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    </head>
+</head>
 
 <body>
 
     <div id="mySidenav" class="sidenav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <a href="signup">Register</a>
-        <a href="log_in">Login</a>
+        <a href="transfer">Logout</a>
+        <a href="welcome/files">Files</a>
         <a href="https://github.com/NickNterm">GitHub</a>
     </div>
 
@@ -34,31 +35,6 @@
         </div>
     </div>
 
-    <script>
-        var textarea = document.querySelector('textarea');
-
-        textarea.addEventListener('keydown', autosize);
-
-        function autosize() {
-            var el = this;
-            setTimeout(function() {
-                el.style.cssText = 'height:auto; padding:0';
-                // for box-sizing other than "content-box" use:
-                // el.style.cssText = '-moz-box-sizing:content-box';
-                el.style.cssText = 'height:' + el.scrollHeight + 'px';
-            }, 0);
-        }
-
-        function openNav() {
-            document.getElementById("mySidenav").style.width = "250px";
-            document.getElementById("main").style.marginLeft = "250px";
-        }
-
-        function closeNav() {
-            document.getElementById("mySidenav").style.width = "0";
-            document.getElementById("main").style.marginLeft = "0";
-        }
-    </script>
 
 </body>
 

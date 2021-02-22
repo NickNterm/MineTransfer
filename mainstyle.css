@@ -37,6 +37,34 @@ body {
     margin-left: 50px;
 }
 
+select {
+    text-align: center;
+    -webkit-appearance: none;
+    appearance: none;
+    margin-top: 7px;
+    font-size: 1.25em;
+    font-weight: 700;
+    border-radius: 4px;
+    width: 85%;
+    height: 35px;
+    background-color: rgb(77, 77, 77);
+    display: inline-block;
+    color: rgb(255, 255, 255);
+    border: 1px solid rgb(77, 77, 77);
+    margin-bottom: 10px;
+    transition: 0.3s;
+}
+
+select::-ms-expand {
+    display: none;
+}
+
+select:hover {
+    border: 1px solid #000;
+    color: #000;
+    background-color: rgb(187, 187, 187);
+}
+
 #main {
     transition: margin-left .5s;
     padding: 5px;
@@ -87,7 +115,7 @@ body {
     -ms-transform: translate(0, -50%);
     transform: translate(0, -50%);
     margin-left: 20px;
-    width: 250px;
+    width: 300px;
     line-height: 35px;
     border-radius: 3px;
     text-align: center;
