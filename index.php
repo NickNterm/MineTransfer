@@ -1,8 +1,55 @@
+<?php
+$servername = "localhost";
+$username = "admin";
+$password = "admin";
+$dbname = "MineTransfer";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+$file = $_FILES['file']['tmp_name'];
+$message = $_POST['message'];
+$expire = $_POST['expire'];
+if ($file != null && $message != null && $expire != null) {
+    $target_dir = "transfers/";
+    $target_file = $target_dir . basename($_FILES["file"]["name"]);
+    $uploadOk = 1;
+    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+    if (isset($_POST["submit"])) {
+        if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_file)) {
+            $name = $_FILES["file"]["name"];
+            createcode:
+            $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            $charactersLength = strlen($characters);
+            $code = '';
+            for ($i = 0; $i < 8; $i++) {
+                $code .= $characters[rand(0, $charactersLength - 1)];
+            }
+            $checksql = "SELECT code FROM Data";
+            $result = $conn->query($checksql);
+            if ($result->num_rows > 0) {
+                // output data of each row
+                while ($row = $result->fetch_assoc()) {
+                    if ($row["code"] == $checksql){
+                        goto createcode;
+                    }
+                }
+            }
+            rename("transfers/".basename($_FILES["file"]["name"]),"transfers/".$code);
+            $sql = "INSERT INTO Data (message, code, filename, date, expire)  VALUES ('$message', '$code', '$name', '" . date('d.m.Y.H.i') . "', '$expire')";
+            if ($conn->query($sql) === TRUE) {
+                #header("Location: shareitnow");
+            } else {
+                echo $conn->error;
+            }
+        }
+    }
+}
+?>
 <html>
 <link rel="stylesheet" href="mainstyle.css">
+
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    </head>
+</head>
 
 <body>
 
@@ -17,11 +64,11 @@
         <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
         <div class="uploadform">
             <img style="width: 250px;" src="upload.png" />
-            <form action="" method="post">
+            <form action="" method="post" enctype="multipart/form-data">
                 <input type="file" name="file" id="file" class="inputfile" />
                 <label for="file">Upload a file</label>
                 <textarea rows='1' name="message" placeholder="Message"></textarea>
-                <select name="cars" id="cars">
+                <select name="expire">
                     <option value="1">Expire in 1 hour</option>
                     <option value="2">Expire in 12 hours</option>
                     <option value="3">Expire in 1 day</option>
@@ -29,7 +76,7 @@
                     <option value="5">Expire in 3 days</option>
                     <option value="6">Expire in 1 week</option>
                 </select>
-                <button type="submit">Transfer</button>
+                <button type="submit" name="submit">Transfer</button>
             </form>
         </div>
     </div>
@@ -42,10 +89,8 @@
         function autosize() {
             var el = this;
             setTimeout(function() {
-                el.style.cssText = 'height:auto; padding:0';
-                // for box-sizing other than "content-box" use:
-                // el.style.cssText = '-moz-box-sizing:content-box';
-                el.style.cssText = 'height:' + el.scrollHeight + 'px';
+                el.style.cssText = 'height:auto; padding: 15px 15px 15px 15px;';
+                el.style.cssText = 'height:' + (el.scrollHeight + 2) + 'px';
             }, 0);
         }
 

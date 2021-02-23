@@ -9,28 +9,32 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 $pass = $_SESSION['password'];
 $user = $_SESSION['username'];
 $salt = $_SESSION['salt'];
-if($pass != null && $user != null && $salt != null){
+if ($pass != null && $user != null && $salt != null) {
     $sql = "SELECT * FROM Login WHERE username = '$user';";
-                $result = $conn->query($sql);
-                if ($result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
-                        $salt = $row["salt"];
-                        if (hash('sha256', $salt . $pass, false) === $row["password"]) {
-
-                        } else {
-                            header("Location: transfer");
-                        }
-                    }
-                }
-}else{
+    $result = $conn->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $salt = $row["salt"];
+            if (hash('sha256', $salt . $pass, false) === $row["password"]) {
+            } else {
+                header("Location: transfer");
+            }
+        }
+    }
+} else {
     header("Location: transfer");
 }
 ?>
 <?php
-$file = $_POST['file'];
+$file = $_FILES['file']['tmp_name'];
 $message = $_POST['message'];
 $expire = $_POST['expire'];
-echo $expire;
+if ($file != null && $message != null && $expire != null) {
+    $sql = "INSERT INTO Data (message, code, file, date, expire)  VALUES ('$message', 'test code', '$file', '" . date('d.m.Y.H.i') . "', '$expire')";
+    if ($conn->query($sql) === TRUE) {
+        header("Location: shareitnow");
+    }
+}
 ?>
 <html>
 <link rel="stylesheet" href="mainstyle.css">
@@ -52,7 +56,7 @@ echo $expire;
         <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
         <div class="uploadform">
             <img style="width: 250px;" src="upload.png" />
-            <form action="" method="post">
+            <form action="" method="post" enctype="multipart/form-data">
                 <input type="file" name="file" id="file" class="inputfile" />
                 <label for="file">Upload a file</label>
                 <textarea rows='1' name="message" placeholder="Message"></textarea>

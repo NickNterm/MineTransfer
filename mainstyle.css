@@ -127,6 +127,7 @@ textarea {
     overflow: hidden;
     display: block;
     resize: none;
+    background: none;
     width: 85%;
     margin: 3px;
     padding-bottom: 10px;
