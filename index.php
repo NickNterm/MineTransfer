@@ -1,56 +1,4 @@
-<?php
-$servername = "localhost";
-$username = "admin";
-$password = "admin";
-$dbname = "MineTransfer";
 
-$conn = new mysqli($servername, $username, $password, $dbname);
-$file = $_FILES['file']['tmp_name'];
-$message = $_POST['message'];
-$expire = $_POST['expire'];
-if ($file != null && $message != null && $expire != null) {
-    echo "not null ";
-    $target_dir = "/media/data/";
-    $target_file = $target_dir . basename($_FILES["file"]["name"]);
-    $uploadOk = 1;
-    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-    if (isset($_POST["submit"])) {
-        echo "submit ";
-        if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_file)) {
-            echo "move ";
-            $name = $_FILES["file"]["name"];
-            createcode:
-            echo "move ";
-            $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            $charactersLength = strlen($characters);
-            $code = '';
-            for ($i = 0; $i < 8; $i++) {
-                $code .= $characters[rand(0, $charactersLength - 1)];
-            }
-            echo "move ";
-            $checksql = "SELECT code FROM Data";
-            $result = $conn->query($checksql);
-            if ($result->num_rows > 0) {
-                // output data of each row
-                while ($row = $result->fetch_assoc()) {
-                    if ($row["code"] == $checksql){
-                        echo "move ";
-                        goto createcode;
-                    }
-                }
-            }
-            echo "code ";
-            rename($target_dir.basename($_FILES["file"]["name"]),$target_dir.$code);
-            $sql = "INSERT INTO Data (message, code, filename, date, expire)  VALUES ('$message', '$code', '$name', '" . date('d.m.Y.H.i') . "', '$expire')";
-            if ($conn->query($sql) === TRUE) {
-                echo "done";
-            } else {
-                echo $conn->error;
-            }
-        }
-    }
-}
-?>
 <html>
 <link rel="stylesheet" href="mainstyle.css">
 
@@ -87,7 +35,54 @@ if ($file != null && $message != null && $expire != null) {
             </form>
         </div>
     </div>
+    <?php
+$servername = "localhost";
+$username = "admin";
+$password = "admin";
+$dbname = "MineTransfer";
 
+$conn = new mysqli($servername, $username, $password, $dbname);
+$file = $_FILES['file']['tmp_name'];
+$message = $_POST['message'];
+$expire = $_POST['expire'];
+if ($file != null && $message != null && $expire != null) {
+    $target_dir = "transfers/";
+    $target_file = $target_dir . basename($_FILES["file"]["name"]);
+    $uploadOk = 1;
+    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+    if (isset($_POST["submit"])) {
+        if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_file)) {
+            $name = $_FILES["file"]["name"];
+            createcode:
+            $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            $charactersLength = strlen($characters);
+            $code = '';
+            for ($i = 0; $i < 8; $i++) {
+                $code .= $characters[rand(0, $charactersLength - 1)];
+            }
+            $checksql = "SELECT code FROM Data";
+            $result = $conn->query($checksql);
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    if ($row["code"] == $checksql){
+                        goto createcode;
+                    }
+                }
+            }
+            rename($target_dir.basename($_FILES["file"]["name"]),$target_dir.$code);
+            $sql = "INSERT INTO Data (message, code, filename, date, expire)  VALUES ('$message', '$code', '$name', '" . date('d.m.Y.H.i') . "', '$expire')";
+            if ($conn->query($sql) === TRUE) {
+                echo "
+                <div class=\"shareit\">
+                Share the link : 192.168.51.111/minetransfer/file/".$code." to install the file.
+            </div>";
+            } else {
+                echo $conn->error;
+            }
+        }
+    }
+}
+?>
     <script>
         var textarea = document.querySelector('textarea');
 
