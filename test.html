@@ -1,44 +1,36 @@
 <html>
 <link rel="stylesheet" href="mainstyle.css">
 
+
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
+
 <body>
-
-    <div id="mySidenav" class="sidenav">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <a href="transfer">Logout</a>
-        <a href="welcome/files">Files</a>
-        <a href="https://github.com/NickNterm">GitHub</a>
-    </div>
-
-    <div id="main">
-        <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
-        <div class="uploadform">
-            <img style="width: 250px;" src="upload.png" />
-            <form action="" method="post">
-                <input type="file" name="file" id="file" class="inputfile" />
-                <label for="file">Upload a file</label>
-                <textarea rows='1' name="message" placeholder="Message"></textarea>
-                <select name="cars" id="cars">
-                    <option value="1">Expire in 1 hour</option>
-                    <option value="2">Expire in 12 hours</option>
-                    <option value="3">Expire in 1 day</option>
-                    <option value="4">Expire in 2 days</option>
-                    <option value="5">Expire in 3 days</option>
-                    <option value="6">Expire in 1 week</option>
-                </select>
-                <button type="submit">Transfer</button>
-            </form>
-        </div>
-    </div>
     <div class="shareit">
-        Share the link : asdfasdfasdf to install the file.
+        <p class='sendmessage'>A user wants to send to you a file (dddddddddddddddddddddddddddddddddasdffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd).
+            His message is ""</p>
+        <button class="download" type='submit'>Download it</button>
     </div>
+    <!-- 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        var imgs = new Array("img1.jpeg", "img2.jpeg", "img3.jpeg", "img4.jpeg", "img5.jpeg");
 
+        function changeBg() {
+            var imgUrl = imgs[Math.floor(Math.random() * imgs.length)];
+            $('.bg').attr('src', imgUrl);
+            $('.bg').fadeIn(750); //this is new, will fade in smoothly
+        }
 
+        function changeBackgroundSmoothly() {
+            $('.bg').fadeOut(750, changeBg); //this is new, will fade out smoothly
+        }
+
+        setInterval(changeBackgroundSmoothly, 5000);
+    </script>
+-->
 </body>
 
 </html>

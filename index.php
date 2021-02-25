@@ -1,4 +1,3 @@
-
 <html>
 <link rel="stylesheet" href="mainstyle.css">
 
@@ -16,11 +15,30 @@
     </div>
 
     <div id="main">
+        <progress id="progressBar" value="0" max="100" style="width:300px;"></progress>
+        <h3 id="status"></h3>
+        <p id="loaded_n_total"></p>
         <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
         <div class="uploadform">
             <img style="width: 250px;" src="upload.png" />
+            <?php
+            $servername = "localhost";
+            $username = "admin";
+            $password = "admin";
+            $dbname = "MineTransfer";
+
+            $conn = new mysqli($servername, $username, $password, $dbname);
+            $file = $_FILES['file']['tmp_name'];
+            $message = $_POST['message'];
+            $expire = $_POST['expire'];
+            if ($file == null || $message == null || $expire == null) {
+                if (isset($_POST["submit"])) {
+                    echo "<div class= 'alert'><p class='error' >please fill all fields</p></div>";
+                }
+            }
+            ?>
             <form action="" method="post" enctype="multipart/form-data">
-                <input type="file" name="file" id="file" class="inputfile" />
+                <input type="file" name="file" id="file" class="inputfile" onchange="uploadFile()" />
                 <label for="file">Upload a file</label>
                 <textarea rows='1' name="message" placeholder="Message"></textarea>
                 <select name="expire">
@@ -36,53 +54,60 @@
         </div>
     </div>
     <?php
-$servername = "localhost";
-$username = "admin";
-$password = "admin";
-$dbname = "MineTransfer";
+    $servername = "localhost";
+    $username = "admin";
+    $password = "admin";
+    $dbname = "MineTransfer";
 
-$conn = new mysqli($servername, $username, $password, $dbname);
-$file = $_FILES['file']['tmp_name'];
-$message = $_POST['message'];
-$expire = $_POST['expire'];
-if ($file != null && $message != null && $expire != null) {
-    $target_dir = "transfers/";
-    $target_file = $target_dir . basename($_FILES["file"]["name"]);
-    $uploadOk = 1;
-    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-    if (isset($_POST["submit"])) {
-        if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_file)) {
-            $name = $_FILES["file"]["name"];
-            createcode:
-            $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            $charactersLength = strlen($characters);
-            $code = '';
-            for ($i = 0; $i < 8; $i++) {
-                $code .= $characters[rand(0, $charactersLength - 1)];
-            }
-            $checksql = "SELECT code FROM Data";
-            $result = $conn->query($checksql);
-            if ($result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                    if ($row["code"] == $checksql){
-                        goto createcode;
+    $conn = new mysqli($servername, $username, $password, $dbname);
+    $file = $_FILES['file']['tmp_name'];
+    $message = $_POST['message'];
+    $expire = $_POST['expire'];
+    if ($file != null && $message != null && $expire != null) {
+        echo 'sub';
+        $target_dir = "transfers/";
+        $target_file = $target_dir . basename($_FILES["file"]["name"]);
+        echo 'sub';
+        $uploadOk = 1;
+        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+        if (isset($_POST["submit"])) {
+            echo 'sub';
+            if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_file)) {
+                echo 'sub';
+                $name = $_FILES["file"]["name"];
+                createcode:
+                $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                $charactersLength = strlen($characters);
+                $code = '';
+                for ($i = 0; $i < 8; $i++) {
+                    $code .= $characters[rand(0, $charactersLength - 1)];
+                }
+                echo 'sub';
+                $checksql = "SELECT code FROM Data";
+                $result = $conn->query($checksql);
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        if ($row["code"] == $checksql) {
+                            goto createcode;
+                        }
                     }
                 }
-            }
-            rename($target_dir.basename($_FILES["file"]["name"]),$target_dir.$code);
-            $sql = "INSERT INTO Data (message, code, filename, date, expire)  VALUES ('$message', '$code', '$name', '" . date('d.m.Y.H.i') . "', '$expire')";
-            if ($conn->query($sql) === TRUE) {
-                echo "
+                echo 'sub';
+                $finalfile = pathinfo('transfers/' . basename($_FILES["file"]["name"]));
+                rename($target_dir . basename($_FILES["file"]["name"]), $target_dir . $code);
+                $sql = "INSERT INTO Data (message, code, filename, date, expire)  VALUES ('$message', '$code', '$name', '" . date('d.m.Y.H.i') . "', '$expire')";
+                if ($conn->query($sql) === TRUE) {
+                    echo "
                 <div class=\"shareit\">
-                Share the link : 192.168.51.111/minetransfer/file/".$code." to install the file.
+                Share the link : minetransfer.mine.bz/file/" . $code . " to install the file.
             </div>";
-            } else {
-                echo $conn->error;
+                } else {
+                    echo $conn->error;
+                }
             }
         }
     }
-}
-?>
+    ?>
     <script>
         var textarea = document.querySelector('textarea');
 
