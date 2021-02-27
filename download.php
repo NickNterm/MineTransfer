@@ -86,7 +86,7 @@
         while ($row = $result->fetch_assoc()) {
 
             echo "<form method='post'><div class=\"shareit\">
-                  <p class='sendmessage'>A user wants to send to you a file (" . $row['filename'] . ").His message is '" . $row['message'] . "'</p>
+                  <p class='sendmessage'>A user wants to send to you a file (" . $row['filename'] . "). The message is '" . $row['message'] . "'</p>
                   <button class=\"download\" type='submit' name='submit'>Download it</button>
                   </div></form>";
         }

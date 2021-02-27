@@ -98,6 +98,22 @@ select:hover {
     z-index: -1;
 }
 
+progress {
+    width: 85%;
+    color: rgb(77, 77, 77);
+    margin-bottom: 10px;
+    border-radius: 4px;
+    height: 20px;
+}
+
+progress::-moz-progress-bar {
+    background: rgb(77, 77, 77);
+}
+
+progress::-webkit-progress-value {
+    background: rgb(77, 77, 77);
+}
+
 .inputfile+label {
     font-size: 1.25em;
     font-weight: 700;
@@ -216,4 +232,27 @@ button:hover {
     -ms-user-select: none;
     user-select: none;
     color: black;
+}
+
+.progress {
+    display: none;
+    position: relative;
+    width: 400px;
+    border: 1px solid #ddd;
+    padding: 1px;
+    border-radius: 3px;
+}
+
+.bar {
+    background-color: #B4F5B4;
+    width: 0%;
+    height: 20px;
+    border-radius: 3px;
+}
+
+.percent {
+    position: absolute;
+    display: inline-block;
+    top: 3px;
+    left: 48%;
 }

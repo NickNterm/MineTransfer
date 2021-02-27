@@ -15,9 +15,6 @@
     </div>
 
     <div id="main">
-        <progress id="progressBar" value="0" max="100" style="width:300px;"></progress>
-        <h3 id="status"></h3>
-        <p id="loaded_n_total"></p>
         <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
         <div class="uploadform">
             <img style="width: 250px;" src="upload.png" />
@@ -38,6 +35,7 @@
             }
             ?>
             <form action="" method="post" enctype="multipart/form-data">
+                <progress id="progressBar" value="0" max="100"></progress>
                 <input type="file" name="file" id="file" class="inputfile" onchange="uploadFile()" />
                 <label for="file">Upload a file</label>
                 <textarea rows='1' name="message" placeholder="Message"></textarea>
@@ -58,22 +56,17 @@
     $username = "admin";
     $password = "admin";
     $dbname = "MineTransfer";
-
     $conn = new mysqli($servername, $username, $password, $dbname);
     $file = $_FILES['file']['tmp_name'];
     $message = $_POST['message'];
     $expire = $_POST['expire'];
     if ($file != null && $message != null && $expire != null) {
-        echo 'sub';
         $target_dir = "transfers/";
         $target_file = $target_dir . basename($_FILES["file"]["name"]);
-        echo 'sub';
         $uploadOk = 1;
         $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
         if (isset($_POST["submit"])) {
-            echo 'sub';
             if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_file)) {
-                echo 'sub';
                 $name = $_FILES["file"]["name"];
                 createcode:
                 $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -82,7 +75,6 @@
                 for ($i = 0; $i < 8; $i++) {
                     $code .= $characters[rand(0, $charactersLength - 1)];
                 }
-                echo 'sub';
                 $checksql = "SELECT code FROM Data";
                 $result = $conn->query($checksql);
                 if ($result->num_rows > 0) {
@@ -92,7 +84,6 @@
                         }
                     }
                 }
-                echo 'sub';
                 $finalfile = pathinfo('transfers/' . basename($_FILES["file"]["name"]));
                 rename($target_dir . basename($_FILES["file"]["name"]), $target_dir . $code);
                 $sql = "INSERT INTO Data (message, code, filename, date, expire)  VALUES ('$message', '$code', '$name', '" . date('d.m.Y.H.i') . "', '$expire')";
@@ -129,6 +120,25 @@
         function closeNav() {
             document.getElementById("mySidenav").style.width = "0";
             document.getElementById("main").style.marginLeft = "0";
+        }
+
+        function _(el) {
+            return document.getElementById(el);
+        }
+
+        function uploadFile() {
+            var file = _("file").files[0];
+            var formdata = new FormData();
+            formdata.append("file", file);
+            var ajax = new XMLHttpRequest();
+            ajax.upload.addEventListener("progress", progressHandler, false);
+            ajax.open("POST", "");
+            ajax.send(formdata);
+        }
+
+        function progressHandler(event) {
+            var percent = (event.loaded / event.total) * 100;
+            _("progressBar").value = Math.round(percent);
         }
     </script>
 

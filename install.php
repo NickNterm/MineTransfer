@@ -16,7 +16,6 @@ if ($result->num_rows > 0) {
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');
         header('Content-Disposition: attachment; filename="' . $row['filename'] . '"');
-        header('Content-Length: ' . filesize('transfers/' . $download));
         header('Pragma: public');
         flush(); // Flush system output buffer
         readfile('transfers/' . $download);

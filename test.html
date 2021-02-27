@@ -1,36 +1,29 @@
-<html>
-<link rel="stylesheet" href="mainstyle.css">
+<h2>HTML5 File Upload Progress Bar Tutorial</h2>
+<form id="upload_form" enctype="multipart/form-data" method="post">
+    <input type="file" name="file1" id="file1" onchange="uploadFile()"><br>
+    <progress id="progressBar" value="0" max="100" style="width:300px;"></progress>
+    <h3 id="status"></h3>
+    <p id="loaded_n_total"></p>
+</form>
+<script>
+    function _(el) {
+        return document.getElementById(el);
+    }
 
+    function uploadFile() {
+        var file = _("file1").files[0];
+        // alert(file.name+" | "+file.size+" | "+file.type);
+        var formdata = new FormData();
+        formdata.append("file1", file);
+        var ajax = new XMLHttpRequest();
+        ajax.upload.addEventListener("progress", progressHandler, false);
+        ajax.open("POST", ""); // http://www.developphp.com/video/JavaScript/File-Upload-Progress-Bar-Meter-Tutorial-Ajax-PHP
+        //use file_upload_parser.php from above url
+        ajax.send(formdata);
+    }
 
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-
-
-<body>
-    <div class="shareit">
-        <p class='sendmessage'>A user wants to send to you a file (dddddddddddddddddddddddddddddddddasdffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd).
-            His message is ""</p>
-        <button class="download" type='submit'>Download it</button>
-    </div>
-    <!-- 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script>
-        var imgs = new Array("img1.jpeg", "img2.jpeg", "img3.jpeg", "img4.jpeg", "img5.jpeg");
-
-        function changeBg() {
-            var imgUrl = imgs[Math.floor(Math.random() * imgs.length)];
-            $('.bg').attr('src', imgUrl);
-            $('.bg').fadeIn(750); //this is new, will fade in smoothly
-        }
-
-        function changeBackgroundSmoothly() {
-            $('.bg').fadeOut(750, changeBg); //this is new, will fade out smoothly
-        }
-
-        setInterval(changeBackgroundSmoothly, 5000);
-    </script>
--->
-</body>
-
-</html>
+    function progressHandler(event) {
+        var percent = (event.loaded / event.total) * 100;
+        _("progressBar").value = Math.round(percent);
+    }
+</script>
