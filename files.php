@@ -1,123 +1,33 @@
+<?php
+session_start();
+$user = $_SESSION['username'];
+if ($_FILES["file"] != null && $user != null) {
+    if (move_uploaded_file($_FILES["file"]["tmp_name"], 'premium/' . $user . '/' . basename($_FILES["file"]["name"]))) {
+        header("Location: myfiles");
+    }
+}
+$download = $_POST['download'];
+if ($download != null && $user != null) {
+    header('Content-Description: File Transfer');
+    header('Content-Type: application/octet-stream');
+    header('Content-Disposition: attachment; filename="' . $download . '"');
+    header('Pragma: public');
+    flush(); // Flush system output buffer
+    readfile('premium/' . $user . '/' . $download);
+    die();
+}
+?>
 <html>
-
+<link rel="stylesheet" href="files.css">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
-<style>
-    body {
-        font-family: "Lato", sans-serif;
-    }
-
-    .grid-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        grid-column-gap: 20px;
-        grid-row-gap: 20px;
-    }
-
-    .grid-item {
-        width: auto;
-        min-width: 200px;
-        height: 40px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        padding-left: 12px;
-        padding-right: 12px;
-        line-height: 40px;
-        border-radius: 3px;
-        background-color: none;
-        border: 1px solid rgba(94, 94, 94, 0.8);
-        transition: 0.2s;
-    }
-
-    .grid-item:hover {
-        box-shadow: 0px 0px 0px black, 0 0 5px rgb(102, 102, 102);
-    }
-
-    .sidenav {
-        height: 100%;
-        width: 0;
-        position: fixed;
-        z-index: 1;
-        top: 0;
-        left: 0;
-        background-color: #111;
-        overflow-x: hidden;
-        transition: 0.5s;
-        padding-top: 60px;
-    }
-
-    .sidenav a {
-        padding: 8px 8px 8px 32px;
-        text-decoration: none;
-        font-size: 25px;
-        color: #818181;
-        display: block;
-        transition: 0.3s;
-    }
-
-    .sidenav a:hover {
-        color: #f1f1f1;
-    }
-
-    .sidenav .closebtn {
-        position: absolute;
-        top: 0;
-        right: 25px;
-        font-size: 36px;
-        margin-left: 50px;
-    }
-
-    @media screen and (max-height: 450px) {
-        .sidenav {
-            padding-top: 15px;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
-        .sidenav a {
-            font-size: 18px;
-        }
-    }
-
-    .inputfile+label {
-        border-radius: 4px;
-        width: 100%;
-        height: 100%;
-        display: inline-block;
-        background: none;
-        color: rgb(0, 0, 0);
-        transition: 0.3s;
-    }
-
-    .inputfile {
-        background: none;
-        width: 0.1px;
-        height: 0.1px;
-        opacity: 0;
-        overflow: hidden;
-        position: absolute;
-        z-index: -1;
-    }
-
-    .progressdiv {
-        background: rgb(77, 77, 77);
-        position: relative;
-        top: -1000;
-        left: 0;
-        width: 0%;
-        height: 1000px;
-        z-index: -1;
-    }
-</style>
-
 <body>
     <div id="mySidenav" class="sidenav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <a href="welcome">Transfer</a>
         <a href="transfer">Logout</a>
-        <a href="welcome/files">Files</a>
         <a href="https://github.com/NickNterm">GitHub</a>
     </div>
 
@@ -130,13 +40,11 @@
         $password = "admin";
         $dbname = "MineTransfer";
 
-
-
         $conn = new mysqli($servername, $username, $password, $dbname);
         $pass = $_SESSION['password'];
         $user = $_SESSION['username'];
         $salt = $_SESSION['salt'];
-        $file = $_FILES['file']['tmp_name'];
+
         if ($pass != null && $user != null && $salt != null) {
             $sql = "SELECT * FROM Login WHERE username = '$user';";
             $result = $conn->query($sql);
@@ -147,8 +55,9 @@
                         $dir = 'premium/' . $user;
                         if ($dh = opendir($dir)) {
                             while (($file = readdir($dh)) !== false) {
-
-                                echo '<div class="grid-item">' . $file . '</div>';
+                                if ($file != "." && $file != "..") {
+                                    echo '<div class="grid-item" id="' . $file . '" onclick="downloadfile(this.id)">' . $file . '</div>';
+                                }
                             }
                             closedir($dh);
                         }
@@ -160,21 +69,19 @@
         } else {
             header("Location: log_in");
         }
-        if ($file != null) {
-            if (move_uploaded_file($_FILES["file"]["tmp_name"], 'premium/' . basename($_FILES["file"]["name"]))) {
-                header("Location: myfiles");
-            }
-        }
+
         ?>
-        <div class="grid-item" style="padding:0;">
-            <form id="mainform" method="post" action="">
-                <input type="file" name="file" id="file" class="inputfile" onchange="uploadFile()" />
+        <form id="mainform" action="" method="post" enctype="multipart/form-data">
+            <div class="grid-item" style="padding:0;">
+                <input type="file" name="file" id="file" class="file" onchange="uploadFile()" />
                 <label for="file" style="margin-left: 10px;">Upload a file</label>
-            </form>
-            <div class="progressdiv" id="progressdivadf"></div>
 
-        </div>
-
+                <div class="progressdiv" id="progressdivadf"></div>
+            </div>
+        </form>
+        <form id="downloadform" action="" method="post" enctype="multipart/form-data">
+            <input type="hidden" id="download" name="download" value='' /></input>
+        </form>
     </div>
     <script>
         function openNav() {
@@ -204,11 +111,17 @@
         function progressHandler(event) {
             var percent = (event.loaded / event.total) * 100;
             _("progressdivadf").style.width = Math.round(percent) + "%";
-            if(percent == 100){
-                document.getElementById("mainform").submit();
+            if (percent == 100) {
+                _("mainform").submit();
             }
         }
+
+        function downloadfile(id) {
+            _("download").value = String(id);
+            _("downloadform").submit();
+        }
     </script>
+
 </body>
 
 </html>
