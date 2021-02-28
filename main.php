@@ -1,41 +1,3 @@
-<?php   
-session_start();
-$servername = "localhost";
-$username = "admin";
-$password = "admin";
-$dbname = "MineTransfer";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-$pass = $_SESSION['password'];
-$user = $_SESSION['username'];
-$salt = $_SESSION['salt'];
-if ($pass != null && $user != null && $salt != null) {
-    $sql = "SELECT * FROM Login WHERE username = '$user';";
-    $result = $conn->query($sql);
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            $salt = $row["salt"];
-            if (hash('sha256', $salt . $pass, false) === $row["password"]) {
-            } else {
-                header("Location: transfer");
-            }
-        }
-    }
-} else {
-    header("Location: transfer");
-}
-?>
-<?php
-$file = $_FILES['file']['tmp_name'];
-$message = $_POST['message'];
-$expire = $_POST['expire'];
-if ($file != null && $message != null && $expire != null) {
-    $sql = "INSERT INTO Data (message, code, file, date, expire)  VALUES ('$message', 'test code', '$file', '" . date('d.m.Y.H.i') . "', '$expire')";
-    if ($conn->query($sql) === TRUE) {
-        header("Location: shareitnow");
-    }
-}
-?>
 <html>
 <link rel="stylesheet" href="mainstyle.css">
 
@@ -47,8 +9,8 @@ if ($file != null && $message != null && $expire != null) {
 
     <div id="mySidenav" class="sidenav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <a href="myfiles">Files</a>
         <a href="transfer">Logout</a>
-        <a href="welcome/files">Files</a>
         <a href="https://github.com/NickNterm">GitHub</a>
     </div>
 
@@ -56,8 +18,34 @@ if ($file != null && $message != null && $expire != null) {
         <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
         <div class="uploadform">
             <img style="width: 250px;" src="upload.png" />
+            <?php
+            session_start();
+            $servername = "localhost";
+            $username = "admin";
+            $password = "admin";
+            $dbname = "MineTransfer";
+
+            $conn = new mysqli($servername, $username, $password, $dbname);
+            $file = $_FILES['file']['tmp_name'];
+            $message = $_POST['message'];
+            $expire = $_POST['expire'];
+            $pass = $_SESSION['password'];
+            $user = $_SESSION['username'];
+            $salt = $_SESSION['salt'];
+            $_SESSION['password'] = $_SESSION['password'];
+            $_SESSION['username'] = $_SESSION['username'];
+            $_SESSION['salt'] = $_SESSION['salt'];
+            if ($pass != null && $user != null && $salt != null) {
+                if ($file == null || $message == null || $expire == null) {
+                    if (isset($_POST["submit"])) {
+                        echo "<div class= 'alert'><p class='error' >please fill all fields</p></div>";
+                    }
+                }
+            }
+            ?>
             <form action="" method="post" enctype="multipart/form-data">
-                <input type="file" name="file" id="file" class="inputfile" />
+                <progress id="progressBar" value="0" max="100"></progress>
+                <input type="file" name="file" id="file" class="inputfile" onchange="uploadFile()" />
                 <label for="file">Upload a file</label>
                 <textarea rows='1' name="message" placeholder="Message"></textarea>
                 <select name="expire">
@@ -68,11 +56,58 @@ if ($file != null && $message != null && $expire != null) {
                     <option value="5">Expire in 3 days</option>
                     <option value="6">Expire in 1 week</option>
                 </select>
-                <button type="submit">Transfer</button>
+                <button type="submit" name="submit">Transfer</button>
             </form>
         </div>
     </div>
-
+    <?php
+    $servername = "localhost";
+    $username = "admin";
+    $password = "admin";
+    $dbname = "MineTransfer";
+    $conn = new mysqli($servername, $username, $password, $dbname);
+    $file = $_FILES['file']['tmp_name'];
+    $message = $_POST['message'];
+    $expire = $_POST['expire'];
+    if ($file != null && $message != null && $expire != null) {
+        $target_dir = "transfers/";
+        $target_file = $target_dir . basename($_FILES["file"]["name"]);
+        $uploadOk = 1;
+        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+        if (isset($_POST["submit"])) {
+            if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_file)) {
+                $name = $_FILES["file"]["name"];
+                createcode:
+                $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                $charactersLength = strlen($characters);
+                $code = '';
+                for ($i = 0; $i < 8; $i++) {
+                    $code .= $characters[rand(0, $charactersLength - 1)];
+                }
+                $checksql = "SELECT code FROM Data";
+                $result = $conn->query($checksql);
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        if ($row["code"] == $checksql) {
+                            goto createcode;
+                        }
+                    }
+                }
+                $finalfile = pathinfo('transfers/' . basename($_FILES["file"]["name"]));
+                rename($target_dir . basename($_FILES["file"]["name"]), $target_dir . $code);
+                $sql = "INSERT INTO Data (message, code, filename, date, expire)  VALUES ('$message', '$code', '$name', '" . date('d.m.Y.H.i') . "', '$expire')";
+                if ($conn->query($sql) === TRUE) {
+                    echo "
+                <div class=\"shareit\">
+                Share the link : minetransfer.mine.bz/file/" . $code . " to install the file.
+            </div>";
+                } else {
+                    echo $conn->error;
+                }
+            }
+        }
+    }
+    ?>
     <script>
         var textarea = document.querySelector('textarea');
 
@@ -81,10 +116,8 @@ if ($file != null && $message != null && $expire != null) {
         function autosize() {
             var el = this;
             setTimeout(function() {
-                el.style.cssText = 'height:auto; padding:0';
-                // for box-sizing other than "content-box" use:
-                // el.style.cssText = '-moz-box-sizing:content-box';
-                el.style.cssText = 'height:' + el.scrollHeight + 'px';
+                el.style.cssText = 'height:auto; padding: 15px 15px 15px 15px;';
+                el.style.cssText = 'height:' + (el.scrollHeight + 2) + 'px';
             }, 0);
         }
 
@@ -96,6 +129,25 @@ if ($file != null && $message != null && $expire != null) {
         function closeNav() {
             document.getElementById("mySidenav").style.width = "0";
             document.getElementById("main").style.marginLeft = "0";
+        }
+
+        function _(el) {
+            return document.getElementById(el);
+        }
+
+        function uploadFile() {
+            var file = _("file").files[0];
+            var formdata = new FormData();
+            formdata.append("file", file);
+            var ajax = new XMLHttpRequest();
+            ajax.upload.addEventListener("progress", progressHandler, false);
+            ajax.open("POST", "");
+            ajax.send(formdata);
+        }
+
+        function progressHandler(event) {
+            var percent = (event.loaded / event.total) * 100;
+            _("progressBar").value = Math.round(percent);
         }
     </script>
 

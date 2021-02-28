@@ -19,6 +19,10 @@
         <div class="uploadform">
             <img style="width: 250px;" src="upload.png" />
             <?php
+            session_start();
+            $_SESSION['password'] = null;
+            $_SESSION['username'] = null;
+            $_SESSION['salt'] = null;
             $servername = "localhost";
             $username = "admin";
             $password = "admin";

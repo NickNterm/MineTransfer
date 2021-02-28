@@ -25,6 +25,7 @@ if ($pass == $pass2 && $pass != null) {
     $hashedpass = hash('sha256', $salt . $pass, false);
     $sql = "INSERT INTO Login (username, password, salt)  VALUES ('$user', '$hashedpass', '$salt')";
     if ($conn->query($sql) === TRUE) {
+        mkdir('/var/www/html/minetransfer/premium/'.$user.'/');
         header('Location: log_in');
     }
 }
@@ -55,8 +56,8 @@ if ($pass == $pass2 && $pass != null) {
             ?>
             <div class="inputs">
                 <input type="text" name="Username" placeholder="Enter Username" required>
-                <input type="password" name="Password" placeholder="Enter Password" required>
-                <input type="password" name="Password2" placeholder="Re-enter Password" required>
+                <input type="password" name="Password" minlength="8" placeholder="Enter Password" required>
+                <input type="password" name="Password2" minlength="8" placeholder="Re-enter Password" required>
             </div>
             <button class="btn" type="submit">Login</button>
         </div>

@@ -18,7 +18,6 @@
             $_SESSION['password'] = null;
             $_SESSION['username'] = null;
             $_SESSION['salt'] = null;
-            $_SESSION['userid'] = null;
             $conn = new mysqli($servername, $username, $password, $dbname);
             $user = $_POST['Username'];
             settype($user, "string");
