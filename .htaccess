@@ -1,0 +1,11 @@
+RewriteRule Pattern Substitution
+
+RewriteEngine on
+RewriteRule ^myfiles$ files.php
+RewriteRule ^file/installing$ install.php
+RewriteRule ^file/([A-Za-z0-9-]+)/?$ download.php?file=$1
+RewriteRule ^transfer$ index.php
+RewriteRule ^signup$ register.php
+RewriteRule ^welcome$ main.php
+RewriteRule ^log_in$ login.php
+
