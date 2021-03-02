@@ -1,1 +1,2 @@
 # MineTransfer
+This is a site that you can upload your files and then share it with someone. Plus you can use it as a cloud. You can login and then use the file section to upload your files and use it as cloud. You can see the site in http://minetransfer.mine.bz
