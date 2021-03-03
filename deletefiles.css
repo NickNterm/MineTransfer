@@ -21,17 +21,31 @@ body {
     border-radius: 3px;
     background-color: none;
     border: 1px solid rgba(94, 94, 94, 0.8);
-    transition: 0.2s;
+    transition: 0.3s;
+}
+
+.grid-item:hover {
+    -ms-transform: rotate(3deg);
+    /* IE 9 */
+    transform: rotate(3deg);
+    border-color: rgb(209, 76, 76);
+    background-color: rgb(209, 76, 76);
+}
+
+.grid-item:hover span {
+    display: none;
+}
+
+.grid-item:hover:before {
+    color: #fff;
+    transition: 0.3s;
+    content: "Delete?"
 }
 
 .deletebuttondiv {
     position: absolute;
     top: 15px;
     right: 15px;
-}
-
-.grid-item:hover {
-    box-shadow: 0px 0px 0px black, 0 0 5px rgb(102, 102, 102);
 }
 
 .sidenav {

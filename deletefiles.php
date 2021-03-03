@@ -1,24 +1,14 @@
 <?php
 session_start();
 $user = $_SESSION['username'];
-if ($_FILES["file"] != null && $user != null) {
-    if (move_uploaded_file($_FILES["file"]["tmp_name"], 'premium/' . $user . '/' . basename($_FILES["file"]["name"]))) {
-        header("Location: myfiles");
-    }
-}
-$download = $_POST['download'];
-if ($download != null && $user != null) {
-    header('Content-Description: File Transfer');
-    header('Content-Type: application/octet-stream');
-    header('Content-Disposition: attachment; filename="' . $download . '"');
-    header('Pragma: public');
-    flush(); // Flush system output buffer
-    readfile('premium/' . $user . '/' . $download);
-    die();
+$delete = $_POST['delete'];
+if ($delete != null && $user != null) {
+    unlink('premium/' . $user . '/' . $delete);
+    header("Refresh:0");
 }
 ?>
 <html>
-<link rel="stylesheet" href="files.css">
+<link rel="stylesheet" href="deletefiles.css">
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -28,8 +18,8 @@ if ($download != null && $user != null) {
 
 <body>
     <div class="deletebuttondiv">
-        <a href="delete">
-            <i class="fa fa-trash-o" id="deletebutton" style="font-size:36px; color:black;"></i>
+        <a href="myfiles">
+            <i class="fa fa-close" id="deletebutton" style="font-size:36px; color:black;"></i>
         </a>
     </div>
     <div id="mySidenav" class="sidenav">
@@ -64,7 +54,7 @@ if ($download != null && $user != null) {
                         if ($dh = opendir($dir)) {
                             while (($file = readdir($dh)) !== false) {
                                 if ($file != "." && $file != "..") {
-                                    echo '<div class="grid-item" id="' . $file . '" onclick="downloadfile(this.id)">' . $file . '</div>';
+                                    echo '<div class="grid-item" id="' . $file . '" onclick="deletefile(this.id)"><span>' . $file . '</span></div>';
                                 }
                             }
                             closedir($dh);
@@ -79,16 +69,8 @@ if ($download != null && $user != null) {
         }
 
         ?>
-        <form id="mainform" action="" method="post" enctype="multipart/form-data">
-            <div class="grid-item" style="padding:0;">
-                <input type="file" name="file" id="file" class="file" onchange="uploadFile()" />
-                <label for="file" style="margin-left: 10px;">Upload a file</label>
-
-                <div class="progressdiv" id="progressdivadf"></div>
-            </div>
-        </form>
-        <form id="downloadform" action="" method="post" enctype="multipart/form-data">
-            <input type="hidden" id="download" name="download" value='' /></input>
+        <form id="deleteform" action="" method="post" enctype="multipart/form-data">
+            <input type="hidden" id="delete" name="delete" value='' /></input>
         </form>
     </div>
     <script>
@@ -124,9 +106,9 @@ if ($download != null && $user != null) {
             }
         }
 
-        function downloadfile(id) {
-            _("download").value = String(id);
-            _("downloadform").submit();
+        function deletefile(id) {
+            _("delete").value = String(id);
+            _("deleteform").submit();
         }
     </script>
 
