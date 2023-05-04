@@ -1,2 +1,3 @@
 # MineTransfer
-This is a site that you can upload your files and then share it with someone. Plus you can use it as a cloud. You can login and then use the file section to upload your files and use it as cloud. You can see the site in http://minetransfer.mine.bz
+
+It's just a bad copy of mine transfer. I just tried the create a web site with php, css, html, js. Is worth it? no. But still i learn a lot and have fun creating it
